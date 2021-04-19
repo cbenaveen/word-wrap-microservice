@@ -9,5 +9,4 @@ class WordWrapMicroserviceApplicationTests {
 	@Test
 	void contextLoads() {
 	}
-
 }

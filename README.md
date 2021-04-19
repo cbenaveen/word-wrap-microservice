@@ -1,7 +1,7 @@
 ## Word Wrap Microservice
 
 ### Introduction
-A microservice implementation, which wraps the given paragraph into chunks of words as per the given size.
+A microservice implementation, which wraps the given contentRequest into chunks of words as per the given size.
 
 #### Example:
 ##### Input Text:

@@ -1,6 +1,7 @@
 package com.naveen.microservice.wordwrap.service;
 
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
+import com.naveen.microservice.wordwrap.wrap.model.Content;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -25,7 +26,7 @@ class WordWrapServiceImpl implements WordWrapService {
 
     @Override
     public Collection<String> wrap(String content, int maxLength) {
-        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(content, maxLength);
+        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(getContent(content), maxLength);
 
         List<String> lines = new ArrayList();
 
@@ -34,6 +35,10 @@ class WordWrapServiceImpl implements WordWrapService {
         }
 
         return lines;
+    }
+
+    private Content getContent(final String content) {
+        return Content.builder().content(content).build();
     }
 
     @Override
@@ -48,11 +53,11 @@ class WordWrapServiceImpl implements WordWrapService {
 
     @Override
     public Flux<String> reactive(String content, int maxLength) {
-        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(content, maxLength);
+        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(getContent(content), maxLength);
         return Flux.fromIterable(inMemoryContentWrap);
     }
 
-    private AbstractContentWrapIterator getContentWrapper(String content, int maxLength) {
+    private AbstractContentWrapIterator getContentWrapper(Content content, int maxLength) {
         return (AbstractContentWrapIterator)
                 applicationContext.getBean("inMemoryContentWrapper", content, maxLength);
     }

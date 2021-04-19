@@ -11,19 +11,11 @@ import java.util.regex.Pattern;
 @Slf4j
 @Getter
 public abstract class AbstractContentWrapIterator implements Iterator<String>, Iterable<String> {
-    protected static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
-    private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
-
     private final Content content;
     private final int maxLength;
 
-    protected AbstractContentWrapIterator(String content, int maxLength) {
-        Content.ContentBuilder contentBuilder = Content.builder().content(content);
-        if (Objects.nonNull(content)) {
-            contentBuilder.words(PATTERN.split(content));
-        }
-
-        this.content = contentBuilder.build();
+    protected AbstractContentWrapIterator(final Content content, int maxLength) {
+        this.content = content;
         this.maxLength = maxLength;
     }
 

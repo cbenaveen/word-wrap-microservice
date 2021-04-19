@@ -69,6 +69,7 @@ public class AbstractContentWrapIteratorTest {
         int iterationCount = 0;
 
         AbstractContentWrapIterator abstractContentWrapIterator = new InMemoryContentWrapper(content, maxLength);
+
         while (abstractContentWrapIterator.hasNext()) {
             iterationCount += 1;
             final String line = abstractContentWrapIterator.next();

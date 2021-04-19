@@ -1,9 +1,9 @@
 package com.naveen.microservice.wordwrap.wrap;
 
+import com.naveen.microservice.wordwrap.wrap.model.Content;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -14,29 +14,24 @@ public abstract class AbstractContentWrapIterator implements Iterator<String>, I
     protected static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
     private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
 
-    private final String content;
+    private final Content content;
     private final int maxLength;
 
-    private String[] words;
-    private int currentWordIndex = 0;
-
     protected AbstractContentWrapIterator(String content, int maxLength) {
-        this.content = content;
-        this.maxLength = maxLength;
-    }
-
-    @PostConstruct
-    protected void splitContent() {
+        Content.ContentBuilder contentBuilder = Content.builder().content(content);
         if (Objects.nonNull(content)) {
-            words = PATTERN.split(content);
+            contentBuilder.words(PATTERN.split(content));
         }
+
+        this.content = contentBuilder.build();
+        this.maxLength = maxLength;
     }
 
     @Override
     public boolean hasNext() {
-        if (Objects.isNull(words) || words.length <= 0) {
+        if (Objects.isNull(content.getWords()) || content.getWords().length <= 0) {
             return false;
-        } else if (words.length == currentWordIndex) {
+        } else if (content.getWords().length == content.getCurrentWordIndex()) {
             return false;
         }
 
@@ -48,15 +43,15 @@ public abstract class AbstractContentWrapIterator implements Iterator<String>, I
         StringBuilder returnLine = new StringBuilder();
 
         while(true) {
-            if (currentWordIndex == words.length) {
+            if (content.getCurrentWordIndex() == content.getWords().length) {
                 break;
             }
 
-            String aWord = words[currentWordIndex];
+            String aWord = content.getWords()[content.getCurrentWordIndex()];
             if(aWord.length() >= maxLength) {
                 if (returnLine.toString().length() == 0) {
                     returnLine.append(aWord);
-                    currentWordIndex += 1;
+                    content.setCurrentWordIndex(content.getCurrentWordIndex() + 1);
                 }
                 break;
             } else if (returnLine.length() + (" " + aWord).length() > maxLength) {
@@ -64,7 +59,7 @@ public abstract class AbstractContentWrapIterator implements Iterator<String>, I
                 break;
             } else {
                 returnLine.append(aWord).append(" ");
-                currentWordIndex += 1;
+                content.setCurrentWordIndex(content.getCurrentWordIndex() + 1);
             }
         }
 

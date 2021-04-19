@@ -2,6 +2,7 @@ package com.naveen.microservice.wordwrap.service;
 
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
 import com.naveen.microservice.wordwrap.wrap.model.Content;
+import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -25,6 +26,7 @@ class WordWrapServiceImpl implements WordWrapService {
     }
 
     @Override
+    @Timed(value = "content_wrap_time")
     public Collection<String> wrap(String content, int maxLength) {
         AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(getContent(content), maxLength);
 

@@ -3,6 +3,7 @@ package com.naveen.microservice.wordwrap.controller;
 import com.naveen.microservice.wordwrap.controller.dto.ContentRequest;
 import com.naveen.microservice.wordwrap.controller.dto.WrappedResponse;
 import com.naveen.microservice.wordwrap.service.WordWrapService;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,14 @@ import java.util.Objects;
 @AllArgsConstructor
 public class WordWrapController {
     private static final String BASE_API_BATH = "/api/v1/wrap";
+    private static final String METRIC_NAME_CONTENT_WRAP_REQUEST = "content.wrap.request";
+    private static final String TAG_KEY_REQUEST_TYPE = "request-type";
+    private static final String TAG_KEY_API_PATH = "api-path";
+    private static final String TAG_NON_REACTIVE = "non-reactive";
+    private static final String TAG_REACTIVE = "reactive";
 
     private final WordWrapService wordWrapService;
+    private final MeterRegistry meterRegistry;
 
     @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest) {
@@ -36,6 +43,9 @@ public class WordWrapController {
         WrappedResponse wrappedResponse = WrappedResponse.builder().lines(wrap).build();
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(wrappedResponse, HttpStatus.OK);
 
+        this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
+                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
+
         return wrappedResponseResponseEntity;
     }
 
@@ -47,6 +57,9 @@ public class WordWrapController {
         Flux<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
                 ? wordWrapService.reactive(contentRequest.getContent())
                 : wordWrapService.reactive(contentRequest.getContent(), contentRequest.getMaxLength());
+
+        this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
+                TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
 
         return wrap;
     }

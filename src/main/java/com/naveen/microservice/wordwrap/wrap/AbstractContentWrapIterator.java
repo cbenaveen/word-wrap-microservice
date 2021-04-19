@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Getter
-public abstract class AbstractContentWrapIterator implements Iterator<String> {
+public abstract class AbstractContentWrapIterator implements Iterator<String>, Iterable<String> {
     protected static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
     private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
 
@@ -69,6 +69,11 @@ public abstract class AbstractContentWrapIterator implements Iterator<String> {
         }
 
         return returnLine.toString();
+    }
+
+    @Override
+    public Iterator<String> iterator() {
+        return this;
     }
 
     @Override

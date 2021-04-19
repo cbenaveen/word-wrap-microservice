@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,13 +25,12 @@ class WordWrapServiceImpl implements WordWrapService {
 
     @Override
     public Collection<String> wrap(String content, int maxLength) {
-        AbstractContentWrapIterator inMemoryContentWrap = (AbstractContentWrapIterator)
-                applicationContext.getBean("inMemoryContentWrapper", content, maxLength);
+        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(content, maxLength);
 
         List<String> lines = new ArrayList();
 
-        while(inMemoryContentWrap.hasNext()) {
-            lines.add(inMemoryContentWrap.next());
+        for (String line: inMemoryContentWrap) {
+            lines.add(line);
         }
 
         return lines;
@@ -39,5 +39,21 @@ class WordWrapServiceImpl implements WordWrapService {
     @Override
     public Collection<String> wrap(String charBuffer) {
         return wrap(charBuffer, defaultMaxLength);
+    }
+
+    @Override
+    public Flux<String> reactive(String content) {
+        return reactive(content, defaultMaxLength);
+    }
+
+    @Override
+    public Flux<String> reactive(String content, int maxLength) {
+        AbstractContentWrapIterator inMemoryContentWrap = getContentWrapper(content, maxLength);
+        return Flux.fromIterable(inMemoryContentWrap);
+    }
+
+    private AbstractContentWrapIterator getContentWrapper(String content, int maxLength) {
+        return (AbstractContentWrapIterator)
+                applicationContext.getBean("inMemoryContentWrapper", content, maxLength);
     }
 }

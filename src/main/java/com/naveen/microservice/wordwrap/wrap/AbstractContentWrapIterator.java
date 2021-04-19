@@ -3,6 +3,7 @@ package com.naveen.microservice.wordwrap.wrap;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.annotation.PostConstruct;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -22,10 +23,9 @@ public abstract class AbstractContentWrapIterator implements Iterator<String> {
     protected AbstractContentWrapIterator(String content, int maxLength) {
         this.content = content;
         this.maxLength = maxLength;
-
-        splitContent();
     }
 
+    @PostConstruct
     protected void splitContent() {
         if (Objects.nonNull(content)) {
             words = PATTERN.split(content);

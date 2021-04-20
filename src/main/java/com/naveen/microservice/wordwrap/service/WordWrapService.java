@@ -9,4 +9,7 @@ public interface WordWrapService {
     Collection<String> wrap(final String content);
     Flux<String> reactive(final String content);
     Flux<String> reactive(final String content, final int maxLength);
+
+    Collection<String> wrap(final long contentId, final int maxLength);
+    Collection<String> wrap(final long contentId);
 }

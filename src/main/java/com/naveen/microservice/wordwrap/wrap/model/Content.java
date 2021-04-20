@@ -9,9 +9,6 @@ import java.util.regex.Pattern;
 
 @Getter
 public class Content implements Serializable {
-    private static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
-    private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
-
     private final String content;
     private final String[] words;
 
@@ -28,6 +25,9 @@ public class Content implements Serializable {
     }
 
     public static class ContentBuilder {
+        private static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
+        private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
+
         private String content;
 
         ContentBuilder() {

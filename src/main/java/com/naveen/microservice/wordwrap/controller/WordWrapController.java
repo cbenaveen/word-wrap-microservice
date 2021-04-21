@@ -7,12 +7,11 @@ import com.naveen.microservice.wordwrap.wrap.WrapTypes;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import javax.validation.Valid;
@@ -63,5 +62,13 @@ public class WordWrapController {
                 TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
 
         return wrap;
+    }
+
+    @RequestMapping(value=BASE_API_BATH, method = RequestMethod.OPTIONS)
+    private ResponseEntity<?> generateOptions() {
+        return ResponseEntity
+                .ok()
+                .allow(HttpMethod.POST, HttpMethod.OPTIONS)
+                .build();
     }
 }

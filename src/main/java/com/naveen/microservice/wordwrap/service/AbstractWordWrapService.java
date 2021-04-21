@@ -17,11 +17,6 @@ abstract class AbstractWordWrapService implements WordWrapService {
     }
 
     @Override
-    public Collection<String> wrap(String content, int maxLength) {
-        return null;
-    }
-
-    @Override
     public Collection<String> wrap(String content) {
         return wrap(content, defaultMaxLength);
     }
@@ -32,18 +27,8 @@ abstract class AbstractWordWrapService implements WordWrapService {
     }
 
     @Override
-    public Flux<String> reactive(String content, int maxLength) {
-        return null;
-    }
-
-    @Override
-    public Collection<String> wrap(long contentId, int maxLength) {
-        return null;
-    }
-
-    @Override
     public Collection<String> wrap(long contentId) {
-        return null;
+        return wrap(contentId, defaultMaxLength);
     }
 
     protected final Content getContent(final String content) {

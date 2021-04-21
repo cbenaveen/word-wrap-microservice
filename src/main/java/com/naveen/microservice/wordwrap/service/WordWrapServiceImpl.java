@@ -45,4 +45,9 @@ class WordWrapServiceImpl extends AbstractWordWrapService {
                 getContent(content), maxLength);
         return Flux.fromIterable(inMemoryContentWrap);
     }
+
+    @Override
+    public Collection<String> wrap(long contentId, int maxLength) {
+        throw new UnsupportedOperationException("The InMemory wrapper does not support persistence based operation");
+    }
 }

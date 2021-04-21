@@ -15,6 +15,8 @@
 	<description>Word wrap microservice build to demonstrate the microservice architecture pattern.</description>
 	<properties>
 		<java.version>11</java.version>
+		<hazelcast-all.version>4.0.2</hazelcast-all.version>
+		<springdoc-openapi-ui.version>1.5.7</springdoc-openapi-ui.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -52,7 +54,12 @@
 		<dependency>
 			<groupId>com.hazelcast</groupId>
 			<artifactId>hazelcast-all</artifactId>
-			<version>4.0.2</version>
+			<version>${hazelcast-all.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-ui</artifactId>
+			<version>${springdoc-openapi-ui.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>

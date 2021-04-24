@@ -1,9 +1,12 @@
 package com.naveen.microservice.wordwrap.controller;
 
 import com.naveen.microservice.wordwrap.controller.dto.ContentRequest;
+import com.naveen.microservice.wordwrap.controller.dto.PaginatedWrappedResponse;
 import com.naveen.microservice.wordwrap.controller.dto.WrappedResponse;
+import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.service.WrapServiceFactory;
 import com.naveen.microservice.wordwrap.wrap.WrapTypes;
+import com.naveen.microservice.wordwrap.wrap.model.CachedContent;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +36,41 @@ public class WordWrapController {
     private final MeterRegistry meterRegistry;
 
     @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest) {
-        log.info("Request received with Paragraph object {}", contentRequest);
+    private ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest,
+                                                               @RequestParam(value = "paginate", defaultValue = "false", required = false) final boolean paginate,
+                                                               @RequestParam(value = "itemsPerPage", defaultValue = "0", required = false) final int itemsPerPage) {
+        log.info("Request received with Paragraph object {}, pagination set to {}", contentRequest, paginate);
+        return (paginate) ? getPaginatedWrappedResponseResponseEntity(contentRequest, itemsPerPage)
+                : getWrappedResponseResponseEntity(contentRequest);
+    }
 
+    private ResponseEntity<WrappedResponse> getPaginatedWrappedResponseResponseEntity(ContentRequest contentRequest, int itemsPerPage) {
+        PersistentWordWrapService persistentWordWrapService = (PersistentWordWrapService) wrapServiceFactory.get(WrapTypes.PAGINATION);
+
+        CachedContent cachedContent = persistentWordWrapService.create(contentRequest.getContent());
+
+        Collection<String> wrap = null;
+        if (contentRequest.getMaxLength() > 0 && itemsPerPage > 0) {
+            wrap = persistentWordWrapService.wrap(cachedContent.getId(), contentRequest.getMaxLength(), itemsPerPage);
+        } else if (contentRequest.getMaxLength() > 0 && itemsPerPage <= 0) {
+            wrap = persistentWordWrapService.wrap(cachedContent.getId(), contentRequest.getMaxLength(),
+                    persistentWordWrapService.getDefaultItemsPerPage());
+        } else if (contentRequest.getMaxLength() <= 0 && itemsPerPage > 0) {
+            wrap = persistentWordWrapService.wrap(cachedContent.getId(), persistentWordWrapService.getDefaultMaxLength(),
+                    itemsPerPage);
+        } else {
+            wrap = persistentWordWrapService.wrap(cachedContent.getId());
+        }
+
+        PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder().lines(wrap)
+                .totalPage(cachedContent.getTotalPage()).currentPage(cachedContent.getCurrentPage()).paginatedBuilder();
+        ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(paginatedWrappedResponse,
+                HttpStatus.OK);
+
+        return wrappedResponseResponseEntity;
+    }
+
+    private ResponseEntity<WrappedResponse> getWrappedResponseResponseEntity(ContentRequest contentRequest) {
         Collection<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
                 ? wrapServiceFactory.get(WrapTypes.INMEMORY).wrap(contentRequest.getContent())
                 : wrapServiceFactory.get(WrapTypes.INMEMORY).wrap(contentRequest.getContent(), contentRequest.getMaxLength());

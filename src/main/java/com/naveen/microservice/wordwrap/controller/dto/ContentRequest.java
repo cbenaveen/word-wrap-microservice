@@ -1,6 +1,5 @@
 package com.naveen.microservice.wordwrap.controller.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.validation.constraints.NotBlank;
@@ -10,9 +9,7 @@ import javax.validation.constraints.NotBlank;
 @Builder
 @ToString
 public class ContentRequest {
-    @NotBlank //@JsonProperty("content")
+    @NotBlank
     private final String content;
-
-    //@JsonProperty("max_length")
     private Integer maxLength;
 }

@@ -40,8 +40,6 @@ public class WrapServiceFactoryTest {
 
     @Test
     public void testGetOfPaginationWrapServiceImpl() {
-        assertThrows(UnsupportedOperationException.class, () -> {
-            wrapServiceFactory.get(WrapTypes.PAGINATION);
-        });
+        assertThat( wrapServiceFactory.get(WrapTypes.PAGINATION), instanceOf(HazelcastCacheWordWrapService.class));
     }
 }

@@ -12,5 +12,5 @@ import java.util.Collection;
 @Builder
 @ToString
 public class WrappedResponse {
-    private final Collection<String> lines;
+    protected final Collection<String> lines;
 }

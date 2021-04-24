@@ -17,7 +17,7 @@ class WrapServiceFactoryImpl implements WrapServiceFactory {
         if (wrapTypes == WrapTypes.INMEMORY) {
             return applicationContext.getBean(WordWrapServiceImpl.class);
         } else if (wrapTypes == WrapTypes.PAGINATION) {
-            throw new UnsupportedOperationException();
+            return applicationContext.getBean(HazelcastCacheWordWrapService.class);
         } else {
             throw new UnsupportedOperationException();
         }

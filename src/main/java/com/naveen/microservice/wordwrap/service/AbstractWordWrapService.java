@@ -26,16 +26,16 @@ abstract class AbstractWordWrapService implements WordWrapService {
         return reactive(content, defaultMaxLength);
     }
 
-    @Override
-    public Collection<String> wrap(long contentId) {
-        return wrap(contentId, defaultMaxLength);
-    }
-
     protected final Content getContent(final String content) {
         return Content.builder().content(content).build();
     }
 
     protected final AbstractContentWrapIterator getContentWrapperIterator(final String beanName, Object... args) {
         return (AbstractContentWrapIterator) applicationContext.getBean(beanName, args);
+    }
+
+    @Override
+    public int getDefaultMaxLength() {
+        return defaultMaxLength;
     }
 }

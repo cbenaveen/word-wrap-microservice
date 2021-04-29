@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Slf4j
-@Service
+@Service("hazelcastCacheWordWrapService")
 class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
     private static final String HAZELCAST_CONTENT_WRAPPER = "hazelcastContentWrapper";
     private static final String ID_GENERATOR_NAME = "cached-content-flake-id-gen";

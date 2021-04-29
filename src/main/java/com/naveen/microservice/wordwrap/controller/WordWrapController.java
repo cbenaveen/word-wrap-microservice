@@ -4,8 +4,6 @@ import com.naveen.microservice.wordwrap.controller.dto.ContentRequest;
 import com.naveen.microservice.wordwrap.controller.dto.PaginatedWrappedResponse;
 import com.naveen.microservice.wordwrap.controller.dto.WrappedResponse;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
-import com.naveen.microservice.wordwrap.service.WrapServiceFactory;
-import com.naveen.microservice.wordwrap.wrap.WrapTypes;
 import com.naveen.microservice.wordwrap.wrap.model.CachedContent;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
@@ -32,7 +30,7 @@ public class WordWrapController {
     private static final String TAG_NON_REACTIVE = "non-reactive";
     private static final String TAG_REACTIVE = "reactive";
 
-    private final WrapServiceFactory wrapServiceFactory;
+    private final PersistentWordWrapService persistentWordWrapService;
     private final MeterRegistry meterRegistry;
 
     @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -45,8 +43,6 @@ public class WordWrapController {
     }
 
     private ResponseEntity<WrappedResponse> getPaginatedWrappedResponseResponseEntity(ContentRequest contentRequest, int itemsPerPage) {
-        PersistentWordWrapService persistentWordWrapService = (PersistentWordWrapService) wrapServiceFactory.get(WrapTypes.PAGINATION);
-
         CachedContent cachedContent = persistentWordWrapService.create(contentRequest.getContent());
 
         Collection<String> wrap = null;
@@ -72,8 +68,8 @@ public class WordWrapController {
 
     private ResponseEntity<WrappedResponse> getWrappedResponseResponseEntity(ContentRequest contentRequest) {
         Collection<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
-                ? wrapServiceFactory.get(WrapTypes.INMEMORY).wrap(contentRequest.getContent())
-                : wrapServiceFactory.get(WrapTypes.INMEMORY).wrap(contentRequest.getContent(), contentRequest.getMaxLength());
+                ? persistentWordWrapService.wrap(contentRequest.getContent())
+                : persistentWordWrapService.wrap(contentRequest.getContent(), contentRequest.getMaxLength());
 
         WrappedResponse wrappedResponse = WrappedResponse.builder().lines(wrap).build();
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(wrappedResponse, HttpStatus.OK);
@@ -90,8 +86,8 @@ public class WordWrapController {
         log.info("Content Wrap Reactive: Request received with Paragraph object {}", contentRequest);
 
         Flux<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
-                ? wrapServiceFactory.get(WrapTypes.INMEMORY).reactive(contentRequest.getContent())
-                : wrapServiceFactory.get(WrapTypes.INMEMORY).reactive(contentRequest.getContent(), contentRequest.getMaxLength());
+                ? persistentWordWrapService.reactive(contentRequest.getContent())
+                : persistentWordWrapService.reactive(contentRequest.getContent(), contentRequest.getMaxLength());
 
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
                 TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();

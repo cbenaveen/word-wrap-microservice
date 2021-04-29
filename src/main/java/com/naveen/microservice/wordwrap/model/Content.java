@@ -1,4 +1,4 @@
-package com.naveen.microservice.wordwrap.wrap.model;
+package com.naveen.microservice.wordwrap.model;
 
 import lombok.Getter;
 import lombok.Setter;

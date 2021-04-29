@@ -1,4 +1,4 @@
-package com.naveen.microservice.wordwrap.wrap.model;
+package com.naveen.microservice.wordwrap.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @Builder
 @Getter
-@KeySpace
+@KeySpace("cached-content")
 public class CachedContent implements Serializable {
     @Id
     private final long id;

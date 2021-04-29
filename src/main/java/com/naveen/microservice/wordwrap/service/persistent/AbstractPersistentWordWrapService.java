@@ -1,0 +1,23 @@
+package com.naveen.microservice.wordwrap.service.persistent;
+
+import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
+import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
+import org.springframework.context.ApplicationContext;
+
+public abstract class AbstractPersistentWordWrapService implements PersistentWordWrapService {
+    protected final ApplicationContext applicationContext;
+    protected final int defaultMaxLength;
+    protected final int defaultItemsPerPage;
+
+    public AbstractPersistentWordWrapService(final ApplicationContext applicationContext,
+                                             final int defaultMaxLength,
+                                             final int defaultItemsPerPage) {
+        this.applicationContext = applicationContext;
+        this.defaultMaxLength = defaultMaxLength;
+        this.defaultItemsPerPage = defaultItemsPerPage;
+    }
+
+    protected final AbstractContentWrapIterator getContentWrapperIterator(final String beanName, Object... args) {
+        return (AbstractContentWrapIterator) applicationContext.getBean(beanName, args);
+    }
+}

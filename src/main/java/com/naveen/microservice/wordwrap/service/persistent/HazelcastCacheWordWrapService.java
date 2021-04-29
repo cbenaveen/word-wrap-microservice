@@ -1,10 +1,11 @@
-package com.naveen.microservice.wordwrap.service;
+package com.naveen.microservice.wordwrap.service.persistent;
 
 import com.hazelcast.core.HazelcastInstance;
 import com.naveen.microservice.wordwrap.repository.CachedContentHazelcastContentRepository;
+import com.naveen.microservice.wordwrap.service.Utils;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
-import com.naveen.microservice.wordwrap.wrap.model.CachedContent;
-import com.naveen.microservice.wordwrap.wrap.model.Content;
+import com.naveen.microservice.wordwrap.model.CachedContent;
+import com.naveen.microservice.wordwrap.model.Content;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,9 +17,8 @@ import java.util.Collection;
 import java.util.List;
 
 @Slf4j
-@Service("hazelcastCacheWordWrapService")
+@Service
 class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
-    private static final String HAZELCAST_CONTENT_WRAPPER = "hazelcastContentWrapper";
     private static final String ID_GENERATOR_NAME = "cached-content-flake-id-gen";
 
     private final CachedContentHazelcastContentRepository cachedContentHazelcastContentRepository;
@@ -37,7 +37,7 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
 
     @Override
     public CachedContent create(String content) {
-        Content c = getContent(content);
+        final Content c = Utils.getContent(content);
 
         long id = hazelcastInstance.getFlakeIdGenerator(ID_GENERATOR_NAME).newId();
         log.info("Generated ID for the new content is {}", id);
@@ -46,13 +46,16 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
 
     @Override
     public Collection<String> wrap(long contentId, int maxLength, int itemsPerPage) {
-        AbstractContentWrapIterator contentWrapperIterator = getContentWrapperIterator(HAZELCAST_CONTENT_WRAPPER,
-                cachedContentHazelcastContentRepository.findById(contentId).get(), maxLength);
+        CachedContent cachedContent = cachedContentHazelcastContentRepository.findById(contentId).get();
+        Content content = cachedContent.getContent();
+
+        AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,
+                content, maxLength);
 
         List<String> lines = new ArrayList();
 
-        while(itemsPerPage > 0 && contentWrapperIterator.hasNext()) {
-            lines.add(contentWrapperIterator.next());
+        while(itemsPerPage > 0 && inMemoryContentWrap.hasNext()) {
+            lines.add(inMemoryContentWrap.next());
             itemsPerPage -= 1;
         }
 

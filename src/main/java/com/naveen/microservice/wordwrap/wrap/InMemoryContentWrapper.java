@@ -1,6 +1,6 @@
 package com.naveen.microservice.wordwrap.wrap;
 
-import com.naveen.microservice.wordwrap.wrap.model.Content;
+import com.naveen.microservice.wordwrap.model.Content;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;

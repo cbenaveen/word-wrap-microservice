@@ -1,7 +1,7 @@
 package com.naveen.microservice.wordwrap.wrap;
 
 
-import com.naveen.microservice.wordwrap.wrap.model.Content;
+import com.naveen.microservice.wordwrap.model.Content;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

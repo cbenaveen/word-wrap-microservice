@@ -1,7 +1,6 @@
-package com.naveen.microservice.wordwrap.service;
+package com.naveen.microservice.wordwrap.service.inmemory;
 
-import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
-import com.naveen.microservice.wordwrap.wrap.model.Content;
+import com.naveen.microservice.wordwrap.service.WordWrapService;
 import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Flux;
 
@@ -24,18 +23,5 @@ abstract class AbstractWordWrapService implements WordWrapService {
     @Override
     public Flux<String> reactive(String content) {
         return reactive(content, defaultMaxLength);
-    }
-
-    protected final Content getContent(final String content) {
-        return Content.builder().content(content).build();
-    }
-
-    protected final AbstractContentWrapIterator getContentWrapperIterator(final String beanName, Object... args) {
-        return (AbstractContentWrapIterator) applicationContext.getBean(beanName, args);
-    }
-
-    @Override
-    public int getDefaultMaxLength() {
-        return defaultMaxLength;
     }
 }

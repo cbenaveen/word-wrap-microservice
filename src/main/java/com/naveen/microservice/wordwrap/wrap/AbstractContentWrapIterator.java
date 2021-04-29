@@ -1,6 +1,6 @@
 package com.naveen.microservice.wordwrap.wrap;
 
-import com.naveen.microservice.wordwrap.wrap.model.Content;
+import com.naveen.microservice.wordwrap.model.Content;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

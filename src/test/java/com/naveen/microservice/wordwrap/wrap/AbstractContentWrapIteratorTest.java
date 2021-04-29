@@ -76,8 +76,7 @@ public class AbstractContentWrapIteratorTest {
 
         while (abstractContentWrapIterator.hasNext()) {
             iterationCount += 1;
-            final String line = abstractContentWrapIterator.next();
-            System.out.println(line);
+            abstractContentWrapIterator.next();
         }
 
         assertEquals(expectedNumberOfIterations, iterationCount);

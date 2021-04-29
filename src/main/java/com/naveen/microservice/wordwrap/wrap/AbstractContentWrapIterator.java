@@ -20,6 +20,10 @@ public abstract class AbstractContentWrapIterator implements Iterator<String>, I
 
     @Override
     public boolean hasNext() {
+        if (Objects.isNull(content) || maxLength <= 0) {
+            throw new IllegalArgumentException("The Content POJO set to the iterator is null");
+        }
+
         if (Objects.isNull(content.getWords()) || content.getWords().length <= 0) {
             return false;
         } else if (content.getWords().length == content.getCurrentWordIndex()) {

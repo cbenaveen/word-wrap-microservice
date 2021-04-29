@@ -72,7 +72,7 @@ public class WordWrapControllerIntegrationTest {
                 .content(contentRequestJsonString);
 
         mockMvc.perform(requestBuilder)
-                .andDo(MockMvcResultHandlers.print())
+//                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isBadRequest())
                 .andExpect(content().string(expectedErrorMessage));
 
@@ -102,7 +102,7 @@ public class WordWrapControllerIntegrationTest {
                 .content(contentRequestJsonString);
 
         mockMvc.perform(requestBuilder)
-                .andDo(MockMvcResultHandlers.print())
+//                .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isUnsupportedMediaType());
 
         verifyZeroInteractionWithServiceObjects();

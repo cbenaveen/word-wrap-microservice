@@ -154,4 +154,38 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         assertEquals(id, cachedContent.getId());
         assertEquals(content, cachedContent.getContent().getContent());
     }
+
+    @Test
+    @DisplayName("Test to verify the wrap functionality with default page size and customer max size")
+    public void testContentWrapByPassingContentAndCustomMaxLengthAndDefaultPage() {
+        final String content = "A Content for test Content Wrap By Passing Content Alone unit test case";
+        final long id = 123987345123980l;
+        final int CUSTOMER_MAX_SIZE = 12;
+
+        when(mockApplicationContext.getBean(anyString(), ArgumentMatchers.<Object>any()))
+                .thenReturn(mockAbstractContentWrapIterator);
+        when(mockAbstractContentWrapIterator.hasNext()).thenReturn(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
+                Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
+        when(mockAbstractContentWrapIterator.next()).thenReturn(
+                "A Content  ", "for test  ", "Content  ", "Wrap By  ",
+                "Passing  ", "Content  ", "Alone  ", "unit test  ", "case ");
+
+        when(hazelcastInstance.getFlakeIdGenerator(anyString())).thenReturn(flakeIdGenerator);
+        when(flakeIdGenerator.newId()).thenReturn(id);
+
+        //create the content
+        CachedContent cachedContent = persistentWordWrapService.create(content);
+        when(contentRepository.findById(anyLong())).thenReturn(Optional.of(cachedContent));
+
+        Collection<String> collection = persistentWordWrapService.wrap(id, CUSTOMER_MAX_SIZE);
+        // since the default page size is 3, we should have only 3 entries in the collections
+        assertEquals(DEFAULT_PAGE_SIZE, collection.size());
+        assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), collection);
+
+        verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
+        assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
+        assertEquals(CUSTOMER_MAX_SIZE, varArgsCapture.getAllValues().get(1));
+        assertEquals(id, cachedContent.getId());
+        assertEquals(content, cachedContent.getContent().getContent());
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,15 +39,22 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
     @Override
     public CachedContent create(String content) {
         final Content c = Utils.getContent(content);
-
         long id = hazelcastInstance.getFlakeIdGenerator(ID_GENERATOR_NAME).newId();
-        log.info("Generated ID for the new content is {}", id);
-        return cachedContentHazelcastContentRepository.save(CachedContent.builder().id(id).content(c).build());
+        CachedContent build = CachedContent.builder().id(id).content(c).build();
+        cachedContentHazelcastContentRepository.save(build);
+
+        return build;
     }
 
     @Override
     public Collection<String> wrap(long contentId, int maxLength, int itemsPerPage) {
-        CachedContent cachedContent = cachedContentHazelcastContentRepository.findById(contentId).get();
+        Optional<CachedContent> cachedContentById = cachedContentHazelcastContentRepository.findById(contentId);
+
+        if (cachedContentById.isEmpty()) {
+            throw new IllegalArgumentException("No Content maps to the content id " + contentId);
+        }
+
+        CachedContent cachedContent = cachedContentById.get();
         Content content = cachedContent.getContent();
 
         AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,

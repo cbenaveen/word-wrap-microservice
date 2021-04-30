@@ -49,7 +49,7 @@ public class WordWrapController {
     }
 
     @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest,
+    protected final ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest,
                                                                @RequestParam(value = "paginate", defaultValue = "false", required = false) final boolean paginate,
                                                                @RequestParam(value = "itemsPerPage", defaultValue = "0", required = false) final int itemsPerPage) {
         log.info("Request received with Paragraph object {}, pagination set to {}", contentRequest, paginate);
@@ -57,15 +57,18 @@ public class WordWrapController {
                 : getWrappedResponseResponseEntity(contentRequest);
     }
 
-    private ResponseEntity<WrappedResponse> getPaginatedWrappedResponseResponseEntity(ContentRequest contentRequest, int itemsPerPage) {
+    protected final ResponseEntity<WrappedResponse> getPaginatedWrappedResponseResponseEntity(ContentRequest contentRequest, int itemsPerPage) {
         CachedContent cachedContent = persistentWordWrapService.create(contentRequest.getContent());
 
+        this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
+                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
+
         Collection<String> wrap;
-        if (contentRequest.getMaxLength() > 0 && itemsPerPage > 0) {
+        if ((Objects.nonNull(contentRequest.getMaxLength()) && contentRequest.getMaxLength() > 0) && itemsPerPage > 0) {
             wrap = persistentWordWrapService.wrap(cachedContent.getId(), contentRequest.getMaxLength(), itemsPerPage);
-        } else if (contentRequest.getMaxLength() > 0 && itemsPerPage <= 0) {
+        } else if ((Objects.nonNull(contentRequest.getMaxLength()) && contentRequest.getMaxLength() > 0) && itemsPerPage <= 0) {
             wrap = persistentWordWrapService.wrap(cachedContent.getId(), contentRequest.getMaxLength(), defaultItemsPerPage);
-        } else if (contentRequest.getMaxLength() <= 0 && itemsPerPage > 0) {
+        } else if ((Objects.isNull(contentRequest.getMaxLength()) || contentRequest.getMaxLength() <= 0) && itemsPerPage > 0) {
             wrap = persistentWordWrapService.wrap(cachedContent.getId(), defaultMaxLength, itemsPerPage);
         } else {
             wrap = persistentWordWrapService.wrap(cachedContent.getId());
@@ -79,7 +82,7 @@ public class WordWrapController {
         return wrappedResponseResponseEntity;
     }
 
-    private ResponseEntity<WrappedResponse> getWrappedResponseResponseEntity(ContentRequest contentRequest) {
+    protected final ResponseEntity<WrappedResponse> getWrappedResponseResponseEntity(ContentRequest contentRequest) {
         Collection<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
                 ? wordWrapService.wrap(contentRequest.getContent(), defaultMaxLength)
                 : wordWrapService.wrap(contentRequest.getContent(), contentRequest.getMaxLength());
@@ -95,7 +98,7 @@ public class WordWrapController {
 
     @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    private Flux<String> processContentWrapReactive(@Valid @RequestBody final ContentRequest contentRequest) {
+    protected final Flux<String> processContentWrapReactive(@Valid @RequestBody final ContentRequest contentRequest) {
         log.info("Content Wrap Reactive: Request received with Paragraph object {}", contentRequest);
 
         Flux<String> wrap = (Objects.isNull(contentRequest.getMaxLength()))
@@ -109,7 +112,7 @@ public class WordWrapController {
     }
 
     @RequestMapping(value=BASE_API_BATH, method = RequestMethod.OPTIONS)
-    private ResponseEntity<?> generateOptions() {
+    protected final ResponseEntity<?> generateOptions() {
         return ResponseEntity
                 .ok()
                 .allow(HttpMethod.POST, HttpMethod.OPTIONS)

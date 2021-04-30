@@ -11,5 +11,5 @@ import javax.validation.constraints.NotBlank;
 public class ContentRequest {
     @NotBlank
     private final String content;
-    private Integer maxLength;
+    private Integer maxLength = null;
 }

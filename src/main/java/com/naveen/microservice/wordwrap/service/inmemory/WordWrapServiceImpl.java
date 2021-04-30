@@ -32,8 +32,8 @@ class WordWrapServiceImpl extends AbstractWordWrapService {
 
         List<String> lines = new ArrayList();
 
-        for (String line: inMemoryContentWrap) {
-            lines.add(line);
+        while(inMemoryContentWrap.hasNext()) {
+            lines.add(inMemoryContentWrap.next());
         }
 
         return lines;

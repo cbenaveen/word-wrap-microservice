@@ -115,7 +115,7 @@ public class WordWrapController {
     protected final ResponseEntity<?> generateOptions() {
         return ResponseEntity
                 .ok()
-                .allow(HttpMethod.POST, HttpMethod.OPTIONS)
+                .allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.OPTIONS)
                 .build();
     }
 }

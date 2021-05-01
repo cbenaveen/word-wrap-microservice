@@ -108,7 +108,7 @@ public class WordWrapController {
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
                 TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
 
-        return wrap.doOnNext(stringSignal -> log.info("From doOnEach {}", stringSignal));
+        return wrap;
     }
 
     @RequestMapping(value=BASE_API_BATH, method = RequestMethod.OPTIONS)

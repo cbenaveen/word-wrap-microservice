@@ -136,27 +136,6 @@ public class WordWrapControllerIntegrationTest {
                         "\"Wrap By  \",\"Passing  \",\"Content Alone  \",\"unit test case \"]}"));
     }
 
-//    @Test
-    @DisplayName("Test response of API with valid content and custom max length input to the /api/v1/wrap's reactive endpoint")
-    public void testValidContentAndCustomMaxLengthSubmittedToReactiveEndpoint() throws Exception {
-        ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).maxLength(4).build();
-        String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
-
-        RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.TEXT_EVENT_STREAM_VALUE)
-                .content(contentRequestJsonString);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_EVENT_STREAM_VALUE))
-                .andExpect(content().string("data:A \n\ndata:Content\n\n" +
-                        "data:for \n\ndata:test\n\ndata:Content\n\ndata:Wrap\n\n" +
-                        "data:By \n\ndata:Passing\n\ndata:Content\n\ndata:Alone\n\n" +
-                        "data:unit\n\ndata:test\n\ndata:case\n\n"));
-    }
-
     @Test
     @DisplayName("Test response of API with valid content and custom max length input to the /api/v1/wrap's reactive endpoint")
     public void testValidContentAndDefaultMaxLengthSubmittedToReactiveEndpoint() throws Exception {
@@ -180,6 +159,36 @@ public class WordWrapControllerIntegrationTest {
                         "data:than the max  \n\ndata:length. The  \n\n" +
                         "data:lines should  \n\ndata:not break any  \n\n" +
                         "data:word in the  \n\ndata:middle. \n\n"));
+    }
+
+//    @Test
+    @DisplayName("Test response of API with valid content and custom max length input to the /api/v1/wrap's reactive endpoint")
+    public void testValidContentAndCustomMaxLengthSubmittedToReactiveEndpoint() throws Exception {
+        ContentRequest contentRequest = ContentRequest.builder().content(CONTENT2).maxLength(20).build();
+        String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post(API_V_1_WRAP)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM_VALUE)
+                .content(contentRequestJsonString);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_EVENT_STREAM_VALUE))
+                .andExpect(content().string("data:Develop a word wrap  \n\n" +
+                        "data:micro service. It  \n\n" +
+                        "data:should take an  \n\n" +
+                        "data:input string and  \n\n" +
+                        "data:return a wrapped  \n\n" +
+                        "data:string so that none  \n\n" +
+                        "data:of the lines are  \n\n" +
+                        "data:longer than the max  \n\n" +
+                        "data:length. The lines  \n\n" +
+                        "data:should not break  \n\n" +
+                        "data:any word in the  \n\n" +
+                        "data:middle. \n\n" +
+                        "\n\n"));
     }
 
     @Test

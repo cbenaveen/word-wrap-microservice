@@ -26,6 +26,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class WordWrapControllerIntegrationTest {
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    /**
+     * Simulated API key copied from application.properties files
+     */
+    private static final String API_KEY = "cb824574-2318-431a-932d-c41b14adc900";
+
     private static final String CONTENT = "A Content for test Content Wrap By Passing Content Alone unit test case";
     private static final String CONTENT2 = "Develop a word wrap micro service. It should take an input string and return " +
             "a wrapped string so that none of the lines are longer than the max length. The lines should not break any " +
@@ -36,6 +41,7 @@ public class WordWrapControllerIntegrationTest {
     private static final String EXPECTED_ERROR_MESSAGE_FOR_INVALID_MAX_LENGTH = "{\"violations\":[{\"fieldName\":" +
             "\"maxLength\",\"message\":\"The max length of words should be greater than 0\"}]}";
     public static final String API_V_1_WRAP = "/api/v1/wrap";
+    public static final String API_KEY_HEADER_NAME = "api_key";
 
     @Autowired
     private MockMvc mockMvc;
@@ -48,7 +54,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contentRequestJsonString);
 
@@ -74,7 +80,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(mediaType)
                 .content(contentRequestJsonString);
 
@@ -90,7 +96,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contentRequestJsonString);
 
@@ -107,7 +113,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contentRequestJsonString);
 
@@ -125,7 +131,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(contentRequestJsonString);
 
@@ -143,7 +149,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .content(contentRequestJsonString);
@@ -168,7 +174,7 @@ public class WordWrapControllerIntegrationTest {
         String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
 
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post(API_V_1_WRAP)
+                .post(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .content(contentRequestJsonString);
@@ -195,12 +201,39 @@ public class WordWrapControllerIntegrationTest {
     @DisplayName("Test response of /api/v1/wrap's OPTION HTTP call")
     public void testOptions() throws Exception {
         RequestBuilder requestBuilder = MockMvcRequestBuilders
-                .options(API_V_1_WRAP)
+                .options(API_V_1_WRAP).header(API_KEY_HEADER_NAME, API_KEY)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.TEXT_EVENT_STREAM_VALUE);
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
                 .andExpect(header().string(HttpHeaders.ALLOW, "GET,POST,DELETE,OPTIONS"));
+    }
+
+    @Test
+    @DisplayName("")
+    public void testWrapAccessWithoutApiKeyHeader() throws Exception {
+        ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).build();
+        String contentRequestJsonString = mapper.writeValueAsString(contentRequest);
+
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .post(API_V_1_WRAP)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(contentRequestJsonString);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("")
+    public void testOptionsWithoutApiKey() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .options(API_V_1_WRAP)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM_VALUE);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isForbidden());
     }
 }

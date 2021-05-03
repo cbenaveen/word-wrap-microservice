@@ -10,8 +10,8 @@ import java.util.Objects;
 @Slf4j
 @Getter
 public abstract class AbstractContentWrapIterator implements Iterator<String>, Iterable<String> {
-    private final Content content;
-    private final int maxLength;
+    protected final Content content;
+    protected final int maxLength;
 
     protected AbstractContentWrapIterator(final Content content, int maxLength) {
         this.content = content;

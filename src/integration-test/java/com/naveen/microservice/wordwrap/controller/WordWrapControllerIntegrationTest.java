@@ -164,7 +164,7 @@ public class WordWrapControllerIntegrationTest {
                         "data:of the lines  \n\ndata:are longer  \n\n" +
                         "data:than the max  \n\ndata:length. The  \n\n" +
                         "data:lines should  \n\ndata:not break any  \n\n" +
-                        "data:word in the  \n\ndata:middle. \n\n"));
+                        "data:word in the  \n\ndata:middle.  \n\n"));
     }
 
 //    @Test

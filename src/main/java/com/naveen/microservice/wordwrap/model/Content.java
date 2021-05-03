@@ -25,7 +25,7 @@ public class Content implements Serializable {
     }
 
     public static class ContentBuilder {
-        private static final String WORD_SPLIT_REGEX_PATTERN = "\\s+";
+        private static final String WORD_SPLIT_REGEX_PATTERN = "\\s";
         private static final Pattern PATTERN = Pattern.compile(WORD_SPLIT_REGEX_PATTERN);
 
         private String content;
@@ -42,7 +42,7 @@ public class Content implements Serializable {
             if (Objects.isNull(content)) {
                 throw new IllegalArgumentException("Content set in this model is invalid");
             }
-            return new Content(content, PATTERN.split(content));
+            return new Content(content, PATTERN.split(content, -1));
         }
     }
 }

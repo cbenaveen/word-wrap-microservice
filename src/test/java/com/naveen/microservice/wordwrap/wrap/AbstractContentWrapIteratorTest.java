@@ -114,10 +114,11 @@ public class AbstractContentWrapIteratorTest {
              */
             return Stream.of(
                     Arguments.of(CONTENT, 10, 25),
-                    Arguments.of(CONTENT, 3, 39),
+                    Arguments.of(CONTENT, 3, 40),
                     Arguments.of(CONTENT, 23, 10),
                     Arguments.of("NAVEEN", 23, 1),
-//                    Arguments.of("    ", 23, 1),
+                    Arguments.of("      Develop a   word      ", 5, 7),
+                    Arguments.of("    ", 23, 1),
                     Arguments.of("", 23, 1)
             );
         }

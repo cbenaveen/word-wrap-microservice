@@ -60,7 +60,7 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
         Content content = cachedContent.getContent();
 
         AbstractContentWrapIterator charByCharWrapper = Utils.getContentWrapperIterator(applicationContext,
-                WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, content, maxLength);
+                WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, content, maxLength, 0);
 
         List<String> lines = new ArrayList();
 

@@ -78,7 +78,7 @@ public class WordWrapController {
         }
 
         PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder().lines(wrap.getLines())
-                .totalPage(cachedContent.getTotalPage()).currentPage(cachedContent.getCurrentPage()).paginatedBuilder();
+                .nextOffset(cachedContent.getCurrentPage()).paginatedBuilder();
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(paginatedWrappedResponse,
                 HttpStatus.OK);
 

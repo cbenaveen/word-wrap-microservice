@@ -1,12 +1,12 @@
 package com.naveen.microservice.wordwrap.service.persistent;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.naveen.microservice.wordwrap.model.CachedContent;
+import com.naveen.microservice.wordwrap.model.Content;
 import com.naveen.microservice.wordwrap.model.WrappedContent;
 import com.naveen.microservice.wordwrap.repository.CachedContentHazelcastContentRepository;
 import com.naveen.microservice.wordwrap.service.Utils;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
-import com.naveen.microservice.wordwrap.model.CachedContent;
-import com.naveen.microservice.wordwrap.model.Content;
 import com.naveen.microservice.wordwrap.wrap.WrapperTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,28 +38,27 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
     }
 
     @Override
-    public CachedContent create(String content) {
+    public CachedContent create(String content, int maxLength) {
         final Content c = Utils.getContent(content);
         long id = hazelcastInstance.getFlakeIdGenerator(ID_GENERATOR_NAME).newId();
-        CachedContent build = CachedContent.builder().id(id).content(c).build();
+        CachedContent build = CachedContent.builder().id(id).maxLength(maxLength).content(c).build();
         cachedContentHazelcastContentRepository.save(build);
 
         return build;
     }
 
     @Override
-    public WrappedContent wrap(long contentId, int maxLength, int itemsPerPage) {
-        Optional<CachedContent> cachedContentById = cachedContentHazelcastContentRepository.findById(contentId);
+    public CachedContent create(String content) {
+        return create(content, defaultMaxLength);
+    }
 
-        if (cachedContentById.isEmpty()) {
-            throw new IllegalArgumentException("No Content maps to the content id " + contentId);
-        }
-
-        CachedContent cachedContent = cachedContentById.get();
-        Content content = cachedContent.getContent();
+    @Override
+    public WrappedContent wrap(long contentId, int nextOffset, int itemsPerPage) {
+        CachedContent cachedContent = getCachedContent(contentId);
 
         AbstractContentWrapIterator charByCharWrapper = Utils.getContentWrapperIterator(applicationContext,
-                WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, content, maxLength, 0);
+                WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, cachedContent.getContent(),
+                cachedContent.getMaxLength(), nextOffset);
 
         List<String> lines = new ArrayList();
 
@@ -69,17 +67,32 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
             itemsPerPage -= 1;
         }
 
-        return  WrappedContent.builder().currentPosition(charByCharWrapper.currentPosition())
+        return WrappedContent.builder().contentId(cachedContent.getId())
+                .currentPosition(charByCharWrapper.currentPosition())
                 .lines(lines).build();
     }
 
     @Override
-    public WrappedContent wrap(long contentId, int maxLength) {
-        return wrap(contentId, maxLength, defaultItemsPerPage);
+    public WrappedContent wrap(long contentId) {
+        CachedContent cachedContent = getCachedContent(contentId);
+        return wrap(contentId, (cachedContent.getCurrentOffset()), defaultItemsPerPage);
     }
 
     @Override
-    public WrappedContent wrap(long contentId) {
-        return wrap(contentId, defaultMaxLength, defaultItemsPerPage);
+    public CachedContent delete(long contentId) {
+        CachedContent cachedContent = getCachedContent(contentId);
+        cachedContentHazelcastContentRepository.deleteById(contentId);
+
+        return cachedContent;
+    }
+
+    private CachedContent getCachedContent(final long contentId) {
+        Optional<CachedContent> cachedContentById = cachedContentHazelcastContentRepository.findById(contentId);
+
+        if (cachedContentById.isEmpty()) {
+            throw new IllegalArgumentException("No Content maps to the content id " + contentId);
+        }
+
+        return cachedContentById.get();
     }
 }

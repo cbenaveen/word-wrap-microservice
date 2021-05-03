@@ -166,7 +166,7 @@ public class HazelcastCacheWordWrapServiceUnitTest {
     public void testContentWrapByPassingContentAndCustomMaxLengthAndDefaultPage() {
         final String content = "A Content for test Content Wrap By Passing Content Alone unit test case";
         final long id = 123987345123980l;
-        final int CUSTOMER_MAX_SIZE = 12;
+        final int CUSTOMER_MAX_SIZE = 10;
 
         Class<? extends Class> wrapperClass = WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER.getWrapperClass().getClass();
         when(mockApplicationContext.getBean(any(wrapperClass), ArgumentMatchers.<Object>any()))
@@ -185,7 +185,7 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         CachedContent cachedContent = persistentWordWrapService.create(content);
         when(contentRepository.findById(anyLong())).thenReturn(Optional.of(cachedContent));
 
-        WrappedContent wrappedContent = persistentWordWrapService.wrap(id, CUSTOMER_MAX_SIZE);
+        WrappedContent wrappedContent = persistentWordWrapService.wrap(id, CUSTOMER_MAX_SIZE, DEFAULT_PAGE_SIZE);
         // since the default page size is 3, we should have only 3 entries in the collections
         assertEquals(DEFAULT_PAGE_SIZE, wrappedContent.getLines().size());
         assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), wrappedContent.getLines());

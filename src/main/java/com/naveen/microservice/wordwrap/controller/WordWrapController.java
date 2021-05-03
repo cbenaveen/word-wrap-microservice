@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.Collection;
 import java.util.Objects;
 
@@ -26,7 +27,8 @@ import java.util.Objects;
 @Slf4j
 @Timed
 public class WordWrapController {
-    private static final String BASE_API_BATH = "/api/v1/wrap";
+    private static final String BASE_API_PATH = "/api/v1/wrap";
+    private static final String PAGINATED_API_PATH = "/api/v1/wrap/{id}";
     private static final String METRIC_NAME_CONTENT_WRAP_REQUEST = "content.wrap.request";
     private static final String TAG_KEY_REQUEST_TYPE = "request-type";
     private static final String TAG_KEY_API_PATH = "api-path";
@@ -51,7 +53,7 @@ public class WordWrapController {
         this.meterRegistry = meterRegistry;
     }
 
-    @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = BASE_API_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
     protected final ResponseEntity<WrappedResponse> processContentWrap(@Valid @RequestBody final ContentRequest contentRequest,
                                                                @RequestParam(value = "paginate", defaultValue = "false", required = false) final boolean paginate,
                                                                @RequestParam(value = "itemsPerPage", defaultValue = "0", required = false) final int itemsPerPage) {
@@ -64,7 +66,7 @@ public class WordWrapController {
         CachedContent cachedContent = persistentWordWrapService.create(contentRequest.getContent());
 
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
-                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
+                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_PATH).increment();
 
         WrappedContent wrap;
         if ((Objects.nonNull(contentRequest.getMaxLength()) && contentRequest.getMaxLength() > 0) && itemsPerPage > 0) {
@@ -78,7 +80,7 @@ public class WordWrapController {
         }
 
         PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder().lines(wrap.getLines())
-                .nextOffset(cachedContent.getCurrentPage()).paginatedBuilder();
+                .contentId(wrap.getContentId()).nextOffset(cachedContent.getCurrentOffset()).paginatedBuilder();
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(paginatedWrappedResponse,
                 HttpStatus.OK);
 
@@ -94,12 +96,12 @@ public class WordWrapController {
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(wrappedResponse, HttpStatus.OK);
 
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
-                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
+                TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_PATH).increment();
 
         return wrappedResponseResponseEntity;
     }
 
-    @PostMapping(value = BASE_API_BATH, consumes = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = BASE_API_PATH, consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     protected final Flux<String> processContentWrapReactive(@Valid @RequestBody final ContentRequest contentRequest) {
         log.info("Content Wrap Reactive: Request received with Paragraph object {}", contentRequest);
@@ -109,16 +111,35 @@ public class WordWrapController {
                 : wordWrapService.reactive(contentRequest.getContent(), contentRequest.getMaxLength());
 
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
-                TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
+                TAG_KEY_REQUEST_TYPE, TAG_REACTIVE, TAG_KEY_API_PATH, BASE_API_PATH).increment();
 
         return wrap;
     }
 
-    @RequestMapping(value=BASE_API_BATH, method = RequestMethod.OPTIONS)
+    @RequestMapping(value= BASE_API_PATH, method = RequestMethod.OPTIONS)
     protected final ResponseEntity<?> generateOptions() {
         return ResponseEntity
                 .ok()
                 .allow(HttpMethod.GET, HttpMethod.POST, HttpMethod.DELETE, HttpMethod.OPTIONS)
                 .build();
+    }
+
+    @GetMapping(value = PAGINATED_API_PATH, consumes = MediaType.APPLICATION_JSON_VALUE)
+    protected final ResponseEntity<WrappedResponse> paginatedWrapperHandler(@Min(0) @PathVariable long id,
+                                                                            @RequestParam(value = "offset", defaultValue = "0", required = false) final int offset) {
+        WrappedContent wrap = persistentWordWrapService.wrap(id, offset, defaultItemsPerPage);
+
+        PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder()
+                .contentId(wrap.getContentId()).lines(wrap.getLines()).nextOffset(wrap.getCurrentPosition()).paginatedBuilder();
+        ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(paginatedWrappedResponse,
+                HttpStatus.OK);
+
+        return wrappedResponseResponseEntity;
+    }
+
+    @DeleteMapping(value = PAGINATED_API_PATH)
+    protected final ResponseEntity deleteContent(@Min(0) @PathVariable long id) {
+        CachedContent wrap = persistentWordWrapService.delete(id);
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

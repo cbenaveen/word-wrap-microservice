@@ -16,6 +16,6 @@ public class CachedContent implements Serializable {
     @Id
     private final long id;
     private final Content content;
-    private int totalPage;
-    private int currentPage;
+    private final int maxLength;
+    private int currentOffset;
 }

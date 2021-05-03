@@ -236,4 +236,27 @@ public class WordWrapControllerIntegrationTest {
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isForbidden());
     }
-}
+
+    @Test
+    @DisplayName("")
+    public void testGetInvalidID() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .get(API_V_1_WRAP + "/423423423423")
+                .header(API_KEY_HEADER_NAME, API_KEY)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("")
+    public void testDeleteInvalidID() throws Exception {
+        RequestBuilder requestBuilder = MockMvcRequestBuilders
+                .delete(API_V_1_WRAP + "/423423423423")
+                .header(API_KEY_HEADER_NAME, API_KEY)
+                .contentType(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isNotFound());
+    }}

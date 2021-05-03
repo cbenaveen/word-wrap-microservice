@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class CustomerResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ExceptionHandler({IllegalArgumentException.class})
     public ResponseEntity<Object> badRequest(HttpServletRequest req, Exception exception) {
         return ResponseEntity.notFound().build();

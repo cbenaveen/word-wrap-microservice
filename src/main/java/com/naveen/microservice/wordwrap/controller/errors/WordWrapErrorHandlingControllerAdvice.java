@@ -2,6 +2,7 @@ package com.naveen.microservice.wordwrap.controller.errors;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.AllArgsConstructor;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @AllArgsConstructor
 @ControllerAdvice
+@Order(1)
 public class WordWrapErrorHandlingControllerAdvice {
     private static final String METRIC_NAME_CONTENT_WRAP_REQUEST_ERRORS = "content.wrap.request.errors";
 

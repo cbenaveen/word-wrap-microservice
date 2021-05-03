@@ -7,6 +7,7 @@ import com.naveen.microservice.wordwrap.model.Content;
 import com.naveen.microservice.wordwrap.repository.CachedContentHazelcastContentRepository;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
+import com.naveen.microservice.wordwrap.wrap.WrapperTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,7 +44,7 @@ public class HazelcastCacheWordWrapServiceUnitTest {
     @Mock
     private AbstractContentWrapIterator mockAbstractContentWrapIterator;
     @Captor
-    private ArgumentCaptor<String> beanNameCapture;
+    private ArgumentCaptor<Class<? extends AbstractContentWrapIterator>> beanNameCapture;
     @Captor
     private ArgumentCaptor<Object> varArgsCapture;
 
@@ -96,8 +97,10 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         final String content = "A Content for test Content Wrap By Passing Content Alone unit test case";
         final long id = 9087866546745l;
 
-        when(mockApplicationContext.getBean(anyString(), ArgumentMatchers.<Object>any()))
+        Class<? extends Class> wrapperClass = WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER.getWrapperClass().getClass();
+        when(mockApplicationContext.getBean(any(wrapperClass), ArgumentMatchers.<Object>any()))
                 .thenReturn(mockAbstractContentWrapIterator);
+
         when(mockAbstractContentWrapIterator.hasNext()).thenReturn(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE);
         when(mockAbstractContentWrapIterator.next()).thenReturn("A Content  ", "for test  ", "Content  ");
 
@@ -127,8 +130,10 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         final long id = 123987345123980l;
         final int CUSTOM_PAGE_SIZE = 20;
 
-        when(mockApplicationContext.getBean(anyString(), ArgumentMatchers.<Object>any()))
+        Class<? extends Class> wrapperClass = WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER.getWrapperClass().getClass();
+        when(mockApplicationContext.getBean(any(wrapperClass), ArgumentMatchers.<Object>any()))
                 .thenReturn(mockAbstractContentWrapIterator);
+
         when(mockAbstractContentWrapIterator.hasNext()).thenReturn(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
         when(mockAbstractContentWrapIterator.next()).thenReturn(
@@ -162,8 +167,10 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         final long id = 123987345123980l;
         final int CUSTOMER_MAX_SIZE = 12;
 
-        when(mockApplicationContext.getBean(anyString(), ArgumentMatchers.<Object>any()))
+        Class<? extends Class> wrapperClass = WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER.getWrapperClass().getClass();
+        when(mockApplicationContext.getBean(any(wrapperClass), ArgumentMatchers.<Object>any()))
                 .thenReturn(mockAbstractContentWrapIterator);
+
         when(mockAbstractContentWrapIterator.hasNext()).thenReturn(Boolean.TRUE, Boolean.TRUE, Boolean.TRUE,
                 Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.TRUE, Boolean.FALSE);
         when(mockAbstractContentWrapIterator.next()).thenReturn(

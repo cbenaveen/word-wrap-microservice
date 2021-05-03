@@ -2,6 +2,7 @@ package com.naveen.microservice.wordwrap.service.inmemory;
 
 import com.naveen.microservice.wordwrap.service.Utils;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
+import com.naveen.microservice.wordwrap.wrap.WrapperTypes;
 import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ class WordWrapServiceImpl extends AbstractWordWrapService {
     @Timed(value = "content_wrap_time")
     public Collection<String> wrap(String content, int maxLength) {
         AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,
-                Utils.getContent(content), maxLength);
+                WrapperTypes.WORD_BY_WORD_WRAPPER, Utils.getContent(content), maxLength);
 
         List<String> lines = new ArrayList();
 
@@ -42,7 +43,7 @@ class WordWrapServiceImpl extends AbstractWordWrapService {
     @Override
     public Flux<String> reactive(String content, int maxLength) {
         AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,
-                Utils.getContent(content), maxLength);
+                WrapperTypes.WORD_BY_WORD_WRAPPER, Utils.getContent(content), maxLength);
         return Flux.fromIterable(inMemoryContentWrap);
     }
 }

@@ -49,7 +49,7 @@ public class AbstractContentWrapIteratorTest {
     @DisplayName("Test to verify iterator behaviour when null Content object is passed in")
     public void testIteratorWithNullContentObject() {
         assertThrows(IllegalArgumentException.class, () -> {
-            AbstractContentWrapIterator abstractContentWrapIterator = new InMemoryContentWrapper(null, 10);
+            AbstractContentWrapIterator abstractContentWrapIterator = new WordByWordSplitWrapper(null, 10);
             while (abstractContentWrapIterator.hasNext()) {
                 abstractContentWrapIterator.next();
             }
@@ -61,7 +61,7 @@ public class AbstractContentWrapIteratorTest {
     public void testIteratorRemove() {
         assertThrows(UnsupportedOperationException.class, () -> {
             Content content = Content.builder().content(CONTENT).build();
-            AbstractContentWrapIterator abstractContentWrapIterator = new InMemoryContentWrapper(content,
+            AbstractContentWrapIterator abstractContentWrapIterator = new WordByWordSplitWrapper(content,
                     10);
             abstractContentWrapIterator.remove();
         });
@@ -73,7 +73,7 @@ public class AbstractContentWrapIteratorTest {
     public void testIteratorWithInvalidMaxLength(int invalidMaxLength) {
         assertThrows(IllegalArgumentException.class, () -> {
             Content content = Content.builder().content(CONTENT).build();
-            AbstractContentWrapIterator abstractContentWrapIterator = new InMemoryContentWrapper(content,
+            AbstractContentWrapIterator abstractContentWrapIterator = new WordByWordSplitWrapper(content,
                     invalidMaxLength);
             while (abstractContentWrapIterator.hasNext()) {
                 abstractContentWrapIterator.next();
@@ -86,7 +86,7 @@ public class AbstractContentWrapIteratorTest {
 
         int iterationCount = 0;
 
-        AbstractContentWrapIterator abstractContentWrapIterator = new InMemoryContentWrapper(build, maxLength);
+        AbstractContentWrapIterator abstractContentWrapIterator = new WordByWordSplitWrapper(build, maxLength);
 
         while (abstractContentWrapIterator.hasNext()) {
             iterationCount += 1;
@@ -99,7 +99,7 @@ public class AbstractContentWrapIteratorTest {
     private void iterate(final String content, int maxLength, int expectedNumberOfIterations) {
         Content build = Content.builder().content(content).build();
         int iterationCount = 0;
-        for(String line: new InMemoryContentWrapper(build, maxLength)) {
+        for(String line: new WordByWordSplitWrapper(build, maxLength)) {
             iterationCount += 1;
         }
 

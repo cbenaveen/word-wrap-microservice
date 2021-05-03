@@ -6,6 +6,7 @@ import com.naveen.microservice.wordwrap.service.Utils;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
 import com.naveen.microservice.wordwrap.model.CachedContent;
 import com.naveen.microservice.wordwrap.model.Content;
+import com.naveen.microservice.wordwrap.wrap.WrapperTypes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,7 +59,7 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
         Content content = cachedContent.getContent();
 
         AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,
-                content, maxLength);
+                WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, content, maxLength);
 
         List<String> lines = new ArrayList();
 

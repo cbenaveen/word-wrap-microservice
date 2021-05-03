@@ -1,8 +1,13 @@
 package com.naveen.microservice.wordwrap.wrap;
 
 import com.naveen.microservice.wordwrap.model.Content;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
+@Component()
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class CharPositionBasedContentWrapper extends AbstractContentWrapIterator {
     private final String rawContent;
     private final int contentLength;

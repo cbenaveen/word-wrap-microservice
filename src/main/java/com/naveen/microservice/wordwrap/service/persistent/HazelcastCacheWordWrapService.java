@@ -1,6 +1,7 @@
 package com.naveen.microservice.wordwrap.service.persistent;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.naveen.microservice.wordwrap.model.WrappedContent;
 import com.naveen.microservice.wordwrap.repository.CachedContentHazelcastContentRepository;
 import com.naveen.microservice.wordwrap.service.Utils;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
@@ -48,7 +49,7 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
     }
 
     @Override
-    public Collection<String> wrap(long contentId, int maxLength, int itemsPerPage) {
+    public WrappedContent wrap(long contentId, int maxLength, int itemsPerPage) {
         Optional<CachedContent> cachedContentById = cachedContentHazelcastContentRepository.findById(contentId);
 
         if (cachedContentById.isEmpty()) {
@@ -58,26 +59,27 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
         CachedContent cachedContent = cachedContentById.get();
         Content content = cachedContent.getContent();
 
-        AbstractContentWrapIterator inMemoryContentWrap = Utils.getContentWrapperIterator(applicationContext,
+        AbstractContentWrapIterator charByCharWrapper = Utils.getContentWrapperIterator(applicationContext,
                 WrapperTypes.CHAR_POSITION_BASED_CONTENT_WRAPPER, content, maxLength);
 
         List<String> lines = new ArrayList();
 
-        while(itemsPerPage > 0 && inMemoryContentWrap.hasNext()) {
-            lines.add(inMemoryContentWrap.next());
+        while(itemsPerPage > 0 && charByCharWrapper.hasNext()) {
+            lines.add(charByCharWrapper.next());
             itemsPerPage -= 1;
         }
 
-        return lines;
+        return  WrappedContent.builder().currentPosition(charByCharWrapper.currentPosition())
+                .lines(lines).build();
     }
 
     @Override
-    public Collection<String> wrap(long contentId, int maxLength) {
+    public WrappedContent wrap(long contentId, int maxLength) {
         return wrap(contentId, maxLength, defaultItemsPerPage);
     }
 
     @Override
-    public Collection<String> wrap(long contentId) {
+    public WrappedContent wrap(long contentId) {
         return wrap(contentId, defaultMaxLength, defaultItemsPerPage);
     }
 }

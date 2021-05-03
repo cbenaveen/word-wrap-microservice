@@ -4,6 +4,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
 import com.naveen.microservice.wordwrap.model.CachedContent;
 import com.naveen.microservice.wordwrap.model.Content;
+import com.naveen.microservice.wordwrap.model.WrappedContent;
 import com.naveen.microservice.wordwrap.repository.CachedContentHazelcastContentRepository;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
@@ -111,10 +112,10 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         CachedContent cachedContent = persistentWordWrapService.create(content);
         when(contentRepository.findById(anyLong())).thenReturn(Optional.of(cachedContent));
 
-        Collection<String> collection = persistentWordWrapService.wrap(id);
+        WrappedContent wrappedContent = persistentWordWrapService.wrap(id);
         // since the default page size is 3, we should have only 3 entries in the collections
-        assertEquals(DEFAULT_PAGE_SIZE, collection.size());
-        assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), collection);
+        assertEquals(DEFAULT_PAGE_SIZE, wrappedContent.getLines().size());
+        assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), wrappedContent.getLines());
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
@@ -147,11 +148,11 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         CachedContent cachedContent = persistentWordWrapService.create(content);
         when(contentRepository.findById(anyLong())).thenReturn(Optional.of(cachedContent));
 
-        Collection<String> collection = persistentWordWrapService.wrap(id, DEFAULT_MAX_LENGTH, CUSTOM_PAGE_SIZE);
+        WrappedContent wrappedContent = persistentWordWrapService.wrap(id, DEFAULT_MAX_LENGTH, CUSTOM_PAGE_SIZE);
         // since the default page size is 3, we should have only 3 entries in the collections
-        assertEquals(9, collection.size());
+        assertEquals(9, wrappedContent.getLines().size());
         assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  ", "Wrap By  ",
-                "Passing  ", "Content  ", "Alone  ", "unit test  ", "case "), collection);
+                "Passing  ", "Content  ", "Alone  ", "unit test  ", "case "), wrappedContent.getLines());
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
@@ -184,10 +185,10 @@ public class HazelcastCacheWordWrapServiceUnitTest {
         CachedContent cachedContent = persistentWordWrapService.create(content);
         when(contentRepository.findById(anyLong())).thenReturn(Optional.of(cachedContent));
 
-        Collection<String> collection = persistentWordWrapService.wrap(id, CUSTOMER_MAX_SIZE);
+        WrappedContent wrappedContent = persistentWordWrapService.wrap(id, CUSTOMER_MAX_SIZE);
         // since the default page size is 3, we should have only 3 entries in the collections
-        assertEquals(DEFAULT_PAGE_SIZE, collection.size());
-        assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), collection);
+        assertEquals(DEFAULT_PAGE_SIZE, wrappedContent.getLines().size());
+        assertEquals(Arrays.asList("A Content  ", "for test  ", "Content  "), wrappedContent.getLines());
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());

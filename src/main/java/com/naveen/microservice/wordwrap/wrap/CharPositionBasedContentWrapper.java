@@ -76,4 +76,9 @@ public class CharPositionBasedContentWrapper extends AbstractContentWrapIterator
 
         return aWord;
     }
+
+    @Override
+    public int currentPosition() {
+        return currentCharIndexPosition;
+    }
 }

@@ -27,4 +27,8 @@ public abstract class AbstractContentWrapIterator implements Iterator<String>, I
     public void remove() {
         throw new UnsupportedOperationException("The remove method of this Iterator is not Supported.");
     }
+
+    public int currentPosition() {
+        return content.getContent().length();
+    }
 }

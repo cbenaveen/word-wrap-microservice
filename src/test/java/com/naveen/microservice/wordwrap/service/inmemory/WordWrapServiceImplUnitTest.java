@@ -3,6 +3,7 @@ package com.naveen.microservice.wordwrap.service.inmemory;
 import com.naveen.microservice.wordwrap.model.Content;
 import com.naveen.microservice.wordwrap.service.WordWrapService;
 import com.naveen.microservice.wordwrap.wrap.AbstractContentWrapIterator;
+import com.naveen.microservice.wordwrap.wrap.WrapperTypes;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ public class WordWrapServiceImplUnitTest {
     @Mock
     private AbstractContentWrapIterator mockAbstractContentWrapIterator;
     @Captor
-    private ArgumentCaptor<String> beanNameCapture;
+    private ArgumentCaptor<Class<? extends AbstractContentWrapIterator>> beanNameCapture;
     @Captor
     private ArgumentCaptor<Object> varArgsCapture;
 
@@ -42,7 +43,8 @@ public class WordWrapServiceImplUnitTest {
     @BeforeEach
     public void setup() {
         wordWrapService = new WordWrapServiceImpl(mockApplicationContext, DEFAULT_MAX_LENGTH);
-        when(mockApplicationContext.getBean(anyString(), ArgumentMatchers.<Object>any()))
+        Class<? extends Class> wrapperClass = WrapperTypes.WORD_BY_WORD_WRAPPER.getWrapperClass().getClass();
+        when(mockApplicationContext.getBean(any(wrapperClass), ArgumentMatchers.<Object>any()))
                 .thenReturn(mockAbstractContentWrapIterator);
     }
 
@@ -55,7 +57,7 @@ public class WordWrapServiceImplUnitTest {
         wordWrapService.wrap(content);
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
-        assertEquals("inMemoryContentWrapper", beanNameCapture.getValue());
+        assertEquals(WrapperTypes.WORD_BY_WORD_WRAPPER.getWrapperClass(), beanNameCapture.getValue());
         assertTrue(varArgsCapture.getAllValues().get(0) instanceof Content);
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
         assertEquals(DEFAULT_MAX_LENGTH, varArgsCapture.getAllValues().get(1));
@@ -71,7 +73,7 @@ public class WordWrapServiceImplUnitTest {
         wordWrapService.wrap(content, maxLength);
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
-        assertEquals("inMemoryContentWrapper", beanNameCapture.getValue());
+        assertEquals(WrapperTypes.WORD_BY_WORD_WRAPPER.getWrapperClass(), beanNameCapture.getValue());
         assertTrue(varArgsCapture.getAllValues().get(0) instanceof Content);
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
         assertEquals(maxLength, varArgsCapture.getAllValues().get(1));
@@ -85,7 +87,7 @@ public class WordWrapServiceImplUnitTest {
         wordWrapService.reactive(content);
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
-        assertEquals("inMemoryContentWrapper", beanNameCapture.getValue());
+        assertEquals(WrapperTypes.WORD_BY_WORD_WRAPPER.getWrapperClass(), beanNameCapture.getValue());
         assertTrue(varArgsCapture.getAllValues().get(0) instanceof Content);
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
         assertEquals(DEFAULT_MAX_LENGTH, varArgsCapture.getAllValues().get(1));
@@ -100,7 +102,7 @@ public class WordWrapServiceImplUnitTest {
         wordWrapService.reactive(content, maxLength);
 
         verify(mockApplicationContext).getBean(beanNameCapture.capture(), varArgsCapture.capture());
-        assertEquals("inMemoryContentWrapper", beanNameCapture.getValue());
+        assertEquals(WrapperTypes.WORD_BY_WORD_WRAPPER.getWrapperClass(), beanNameCapture.getValue());
         assertTrue(varArgsCapture.getAllValues().get(0) instanceof Content);
         assertEquals(content, ((Content) varArgsCapture.getAllValues().get(0)).getContent());
         assertEquals(maxLength, varArgsCapture.getAllValues().get(1));

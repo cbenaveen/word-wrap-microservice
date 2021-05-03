@@ -3,6 +3,7 @@ package com.naveen.microservice.wordwrap.controller;
 import com.naveen.microservice.wordwrap.controller.dto.ContentRequest;
 import com.naveen.microservice.wordwrap.model.CachedContent;
 import com.naveen.microservice.wordwrap.model.Content;
+import com.naveen.microservice.wordwrap.model.WrappedContent;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.service.WordWrapService;
 import io.micrometer.core.instrument.Counter;
@@ -101,6 +102,7 @@ public class WordWrapControllerUnitTest {
         ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).build();
 
         when(persistentWordWrapService.create(anyString())).thenReturn(mock);
+        when(persistentWordWrapService.wrap(anyLong())).thenReturn(WrappedContent.builder().build());
 
         wordWrapController.processContentWrap(contentRequest, true, 0);
 
@@ -117,6 +119,7 @@ public class WordWrapControllerUnitTest {
         ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).maxLength(maxLength).build();
 
         when(persistentWordWrapService.create(anyString())).thenReturn(mock);
+        when(persistentWordWrapService.wrap(anyLong(), anyInt(), anyInt())).thenReturn(WrappedContent.builder().build());
 
         wordWrapController.processContentWrap(contentRequest, true, 0);
 
@@ -137,6 +140,7 @@ public class WordWrapControllerUnitTest {
         ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).maxLength(maxLength).build();
 
         when(persistentWordWrapService.create(anyString())).thenReturn(mock);
+        when(persistentWordWrapService.wrap(anyLong(), anyInt(), anyInt())).thenReturn(WrappedContent.builder().build());
 
         wordWrapController.processContentWrap(contentRequest, true, customPage);
 
@@ -156,6 +160,7 @@ public class WordWrapControllerUnitTest {
         ContentRequest contentRequest = ContentRequest.builder().content(CONTENT).build();
 
         when(persistentWordWrapService.create(anyString())).thenReturn(mock);
+        when(persistentWordWrapService.wrap(anyLong(), anyInt(), anyInt())).thenReturn(WrappedContent.builder().build());
 
         wordWrapController.processContentWrap(contentRequest, true, customPage);
 

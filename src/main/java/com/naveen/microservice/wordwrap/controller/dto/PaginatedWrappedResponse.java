@@ -8,13 +8,11 @@ import java.util.Collection;
 @Getter
 @ToString
 public class PaginatedWrappedResponse extends WrappedResponse {
-    private final int totalPage;
-    private final int currentPage;
+    private final int nextOffset;
 
-    public PaginatedWrappedResponse(Collection<String> lines, final int totalPage, final int currentPage) {
+    public PaginatedWrappedResponse(Collection<String> lines, final int nextOffset) {
         super(lines);
-        this.totalPage = totalPage;
-        this.currentPage = currentPage;
+        this.nextOffset = nextOffset;
     }
 
     public static PaginatedWrappedResponseBuilder paginatedBuilder() {
@@ -22,13 +20,12 @@ public class PaginatedWrappedResponse extends WrappedResponse {
     }
 
     public PaginatedWrappedResponseBuilder toBuilder() {
-        return new PaginatedWrappedResponseBuilder().lines(this.lines).totalPage(this.totalPage).currentPage(this.currentPage);
+        return new PaginatedWrappedResponseBuilder().lines(this.lines).nextOffset(this.nextOffset);
     }
 
     public static class PaginatedWrappedResponseBuilder {
         private Collection<String> lines;
-        private int totalPage;
-        private int currentPage;
+        private int nextOffset;
 
         PaginatedWrappedResponseBuilder() {
         }
@@ -38,22 +35,18 @@ public class PaginatedWrappedResponse extends WrappedResponse {
             return this;
         }
 
-        public PaginatedWrappedResponseBuilder totalPage(int totalPage) {
-            this.totalPage = totalPage;
-            return this;
-        }
-
-        public PaginatedWrappedResponseBuilder currentPage(int currentPage) {
-            this.currentPage = currentPage;
+        public PaginatedWrappedResponseBuilder nextOffset(int nextOffset) {
+            this.nextOffset = nextOffset;
             return this;
         }
 
         public PaginatedWrappedResponse paginatedBuilder() {
-            return new PaginatedWrappedResponse(lines, totalPage, currentPage);
+            return new PaginatedWrappedResponse(lines, nextOffset);
         }
 
         public String toString() {
-            return "PaginatedWrappedResponse.PaginatedWrappedResponseBuilder(lines=" + this.lines + ", totalPage=" + this.totalPage + ", currentPage=" + this.currentPage + ")";
+            return "PaginatedWrappedResponse.PaginatedWrappedResponseBuilder(lines=" + this.lines
+                    + ", currentPage=" + this.nextOffset + ")";
         }
     }
 }

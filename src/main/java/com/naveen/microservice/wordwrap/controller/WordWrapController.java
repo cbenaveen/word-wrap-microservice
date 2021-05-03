@@ -3,6 +3,7 @@ package com.naveen.microservice.wordwrap.controller;
 import com.naveen.microservice.wordwrap.controller.dto.ContentRequest;
 import com.naveen.microservice.wordwrap.controller.dto.PaginatedWrappedResponse;
 import com.naveen.microservice.wordwrap.controller.dto.WrappedResponse;
+import com.naveen.microservice.wordwrap.model.WrappedContent;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.service.WordWrapService;
 import com.naveen.microservice.wordwrap.model.CachedContent;
@@ -65,7 +66,7 @@ public class WordWrapController {
         this.meterRegistry.counter(METRIC_NAME_CONTENT_WRAP_REQUEST,
                 TAG_KEY_REQUEST_TYPE, TAG_NON_REACTIVE, TAG_KEY_API_PATH, BASE_API_BATH).increment();
 
-        Collection<String> wrap;
+        WrappedContent wrap;
         if ((Objects.nonNull(contentRequest.getMaxLength()) && contentRequest.getMaxLength() > 0) && itemsPerPage > 0) {
             wrap = persistentWordWrapService.wrap(cachedContent.getId(), contentRequest.getMaxLength(), itemsPerPage);
         } else if ((Objects.nonNull(contentRequest.getMaxLength()) && contentRequest.getMaxLength() > 0) && itemsPerPage <= 0) {
@@ -76,8 +77,8 @@ public class WordWrapController {
             wrap = persistentWordWrapService.wrap(cachedContent.getId());
         }
 
-        PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder().lines(wrap)
-                .totalPage(cachedContent.getTotalPage()).currentPage(cachedContent.getCurrentPage()).paginatedBuilder();
+        PaginatedWrappedResponse paginatedWrappedResponse = PaginatedWrappedResponse.paginatedBuilder().lines(wrap.getLines())
+                .nextOffset(cachedContent.getCurrentPage()).paginatedBuilder();
         ResponseEntity<WrappedResponse> wrappedResponseResponseEntity =  new ResponseEntity(paginatedWrappedResponse,
                 HttpStatus.OK);
 

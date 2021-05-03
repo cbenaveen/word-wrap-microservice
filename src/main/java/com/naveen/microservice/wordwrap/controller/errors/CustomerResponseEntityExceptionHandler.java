@@ -1,4 +1,4 @@
-package com.naveen.microservice.wordwrap.controller;
+package com.naveen.microservice.wordwrap.controller.errors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

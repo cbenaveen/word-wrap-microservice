@@ -6,6 +6,7 @@ import com.naveen.microservice.wordwrap.controller.dto.WrappedResponse;
 import com.naveen.microservice.wordwrap.service.PersistentWordWrapService;
 import com.naveen.microservice.wordwrap.service.WordWrapService;
 import com.naveen.microservice.wordwrap.model.CachedContent;
+import io.micrometer.core.annotation.Timed;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +23,7 @@ import java.util.Objects;
 
 @RestController
 @Slf4j
+@Timed
 public class WordWrapController {
     private static final String BASE_API_BATH = "/api/v1/wrap";
     private static final String METRIC_NAME_CONTENT_WRAP_REQUEST = "content.wrap.request";

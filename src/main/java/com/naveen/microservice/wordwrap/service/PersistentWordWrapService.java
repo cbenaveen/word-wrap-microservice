@@ -10,4 +10,5 @@ public interface PersistentWordWrapService {
     CachedContent create(final String content);
     WrappedContent wrap(final long contentId, final int nextOffset, final int itemPerPage);
     WrappedContent wrap(final long contentId);
+    CachedContent delete(final long contentId);
 }

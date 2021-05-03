@@ -67,14 +67,23 @@ class HazelcastCacheWordWrapService extends AbstractPersistentWordWrapService {
             itemsPerPage -= 1;
         }
 
-        return WrappedContent.builder().currentPosition(charByCharWrapper.currentPosition())
+        return WrappedContent.builder().contentId(cachedContent.getId())
+                .currentPosition(charByCharWrapper.currentPosition())
                 .lines(lines).build();
     }
 
     @Override
     public WrappedContent wrap(long contentId) {
         CachedContent cachedContent = getCachedContent(contentId);
-        return wrap(contentId, (cachedContent.getCurrentOffset() + 1), defaultItemsPerPage);
+        return wrap(contentId, (cachedContent.getCurrentOffset()), defaultItemsPerPage);
+    }
+
+    @Override
+    public CachedContent delete(long contentId) {
+        CachedContent cachedContent = getCachedContent(contentId);
+        cachedContentHazelcastContentRepository.deleteById(contentId);
+
+        return cachedContent;
     }
 
     private CachedContent getCachedContent(final long contentId) {

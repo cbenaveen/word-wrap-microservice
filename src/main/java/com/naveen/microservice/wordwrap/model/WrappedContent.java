@@ -8,6 +8,7 @@ import java.util.Collection;
 @Value
 @Builder
 public class WrappedContent {
+    private long contentId;
     private Collection<String> lines;
     private int currentPosition;
 }
